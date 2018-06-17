@@ -1,0 +1,3 @@
+# LectureCapturingSystem
+
+Backend Node API
