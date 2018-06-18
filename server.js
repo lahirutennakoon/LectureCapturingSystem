@@ -2,6 +2,8 @@
 const express        = require('express');
 const bodyParser     = require('body-parser');
 const mongoose = require('mongoose');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
 
 // Import configuration file
 const config = require('./configurations/config');
@@ -13,6 +15,8 @@ const server = express();
 const serverPort = config.serverPort;
 const databaseUrl = config.databaseUrl;
 
+server.use(cors);
+server.use(fileUpload());
 server.use(routes);
 
 // Connect to mongodb database
