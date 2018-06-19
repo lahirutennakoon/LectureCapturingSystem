@@ -13,15 +13,23 @@ router.use(bodyParser.json());
 
 // Function to upload video from the OBS studio plugin
 module.exports.uploadVideo = function (req,res) {
-    console.log("video");
+    console.log("uploading video");
     const videoSavingPath = config.videoSavingPath;
 
-    // Get the video from the request
+    // Get the video file from the request
     const videoFile = req.files.lectureVideo;
-    console.log(videoFile);
+
+    // Replace spaces and append timestamp to video filename
+    let modifiedVideoFilename = videoFile.name.replace(/\s/g,'_');
+    const dateTime = new Date();
+    console.log('dateTime:' + dateTime);
+
+    const timestamp = dateTime.getTime();
+    modifiedVideoFilename = timestamp + '_' + modifiedVideoFilename;
+    console.log("modified: " + modifiedVideoFilename);
 
     // Save the video in the location
-    videoFile.mv(videoSavingPath + videoFile.name, function(err) {
+    videoFile.mv(videoSavingPath + modifiedVideoFilename, function(err) {
         if (err)
         {
             res.json({
@@ -31,12 +39,14 @@ module.exports.uploadVideo = function (req,res) {
         }
         else
         {
-            // Get other values from the request
+            // Get other values from the request and add them to schema model object
             let video = new videoModel();
             video.subject = req.body.subject;
-            video.lectureVideo = videoSavingPath + videoFile.name;
+            video.lectureVideo = modifiedVideoFilename;
+            video.dateTime = dateTime;
             video.status = 'unprocessed';
 
+            // Save in database
             video.save(function(err) {
                 if (err)
                 {

@@ -15,7 +15,7 @@ const server = express();
 const serverPort = config.serverPort;
 const databaseUrl = config.databaseUrl;
 
-server.use(cors);
+server.use(cors());
 server.use(fileUpload());
 server.use(routes);
 
