@@ -19,53 +19,69 @@ module.exports.uploadVideo = function (req,res) {
     // Get the video file from the request
     const videoFile = req.files.lectureVideo;
 
-    // Replace spaces and append timestamp to video filename
-    let modifiedVideoFilename = videoFile.name.replace(/\s/g,'_');
-    const dateTime = new Date();
-    console.log('dateTime:' + dateTime);
+    // console.log(videoFile);
 
-    const timestamp = dateTime.getTime();
-    modifiedVideoFilename = timestamp + '_' + modifiedVideoFilename;
-    console.log("modified: " + modifiedVideoFilename);
+    const mimeType = videoFile.mimetype.substring(0, 5);
+    console.log(mimeType);
 
-    // Save the video in the location
-    videoFile.mv(videoSavingPath + modifiedVideoFilename, function(err) {
-        if (err)
-        {
-            res.json({
-                success: false,
-                msg: err
-            });
-        }
-        else
-        {
-            // Get other values from the request and add them to schema model object
-            let video = new videoModel();
-            video.subject = req.body.subject;
-            video.lectureVideo = modifiedVideoFilename;
-            video.dateTime = dateTime;
-            video.status = 'unprocessed';
+    if(mimeType === 'video')
+    {
+        // Replace spaces and append timestamp to video filename
+        let modifiedVideoFilename = videoFile.name.replace(/\s/g,'_');
+        const dateTime = new Date();
+        console.log('dateTime:' + dateTime);
 
-            // Save in database
-            video.save(function(err) {
-                if (err)
-                {
-                    res.json({
-                        success: false,
-                        msg: err
-                    });
-                }
-                else
-                {
-                    res.json({
-                        success:true,
-                        msg:'Video uploaded successfully'
-                    });
-                }
+        const timestamp = dateTime.getTime();
+        modifiedVideoFilename = timestamp + '_' + modifiedVideoFilename;
+        console.log("modified: " + modifiedVideoFilename);
 
-            });
-        }
+        // Save the video in the location
+        videoFile.mv(videoSavingPath + modifiedVideoFilename, function(err) {
+            if (err)
+            {
+                res.json({
+                    success: false,
+                    msg: err
+                });
+            }
+            else
+            {
+                // Get other values from the request and add them to schema model object
+                let video = new videoModel();
+                video.subject = req.body.subject;
+                video.lectureVideo = modifiedVideoFilename;
+                video.dateTime = dateTime;
+                video.status = 'unprocessed';
 
-    });
+                // Save in database
+                video.save(function(err) {
+                    if (err)
+                    {
+                        res.json({
+                            success: false,
+                            msg: err
+                        });
+                    }
+                    else
+                    {
+                        res.json({
+                            success:true,
+                            msg:'Video uploaded successfully'
+                        });
+                    }
+
+                });
+            }
+
+        });
+    }
+    else
+    {
+        res.json({
+            success: false,
+            msg: 'Invalid file type.'
+        });
+    }
+
 };
 
