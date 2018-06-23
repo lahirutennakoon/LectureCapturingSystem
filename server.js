@@ -34,7 +34,7 @@ mongoose.connect(databaseUrl, function(err){
     else{
         console.log('Connected to: '+ databaseUrl)
     }
-})
+});
 
 server.use('/user', authRoute);
 

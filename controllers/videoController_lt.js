@@ -85,3 +85,19 @@ module.exports.uploadVideo = function (req,res) {
 
 };
 
+// Get all lecture videos
+module.exports.getAllVideos = function (req, res) {
+    videoModel.find({}, function (error, videos) {
+        if(error){
+            res.json({
+                success: false,
+                msg: error
+            });
+        }
+        else
+        {
+            res.json(videos);
+        }
+    });
+};
+
