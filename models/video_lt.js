@@ -6,9 +6,13 @@ const videoSchema = new Schema({
         type: String,
         required: true
     },
-    lecture: {
+    lectureVideo: {
         type: String,
         required: true
+    },
+    dateTime: {
+        type: String,
+        required: false
     },
     status: {
         type: String,
