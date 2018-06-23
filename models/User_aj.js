@@ -13,6 +13,9 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         required: true,
         default: new Date()
+    },
+    usertype: {
+        type: String
     }
 });
 

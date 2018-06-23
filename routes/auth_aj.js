@@ -3,7 +3,7 @@ var router = express.Router()
 var authController = require('../controllers/authController_aj')
 
 router.post('/:username', function(req, res, next) {
-    authController.login(req.body.username, req.body.password, function(err, result){
+    authController.login(req.body.username, req.body.password, function(err, result,usertype){
         if(err){
             console.log(err);
             res.status(500).json({
@@ -14,9 +14,11 @@ router.post('/:username', function(req, res, next) {
         }
 
         if(result){
+
+            console.log("authController().login().result :" + usertype);
             res.status(200).json({
                 success: 1,
-                data: {tokenID: result, username: req.body.username}
+                data: {tokenID: result, username: req.body.username, usertype: usertype}
             });
         }else{
             res.status(401).json({
@@ -28,7 +30,7 @@ router.post('/:username', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    authController.register(req.body.username, req.body.password, function(err, result){
+    authController.register(req.body.username, req.body.password, req.body.usertype, function(err, result){
         if(err){
             console.log(err);
             res.status(500).json({

@@ -25,18 +25,20 @@ module.exports = {
 
                     if(isMatch){
                         var authToken = jwt.sign({ username: user.username, _id: user._id}, config.JWTSECRET);
-                        callback(null, authToken);
+                        var usertype = user.usertype;
+                        callback(null, authToken,usertype);
                     }else{
                         callback(err, null);
                     }
                 });
+
             };
 
         });
     },
-    register: function(username, password, callback){
+    register: function(username, password, usertype, callback){
 
-        var newUser = new User({username,password});
+        var newUser = new User({username,password,usertype});
 
         newUser.save(function(err, user) {
             if(err){
