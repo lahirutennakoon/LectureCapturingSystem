@@ -49,6 +49,7 @@ module.exports.uploadVideo = function (req,res) {
                 // Get other values from the request and add them to schema model object
                 let video = new videoModel();
                 video.subject = req.body.subject;
+                video.videoName = req.body.videoName;
                 video.lectureVideo = modifiedVideoFilename;
                 video.dateTime = dateTime;
                 video.status = 'unprocessed';
