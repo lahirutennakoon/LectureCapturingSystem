@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
+const cmd=require('node-cmd');
+var fs = require('fs');
 
 //Import model
 const videoModel = require('../models/video_lt');
@@ -15,6 +17,12 @@ router.use(bodyParser.json());
 module.exports.uploadVideo = function (req,res) {
     console.log("uploading video");
     const videoSavingPath = config.videoSavingPath;
+
+    // If directory to save videos does not exist, make a directory
+    if (!fs.existsSync(videoSavingPath))
+    {
+        fs.mkdirSync(videoSavingPath);
+    }
 
     // Get the video file from the request
     const videoFile = req.files.lectureVideo;
@@ -102,3 +110,58 @@ module.exports.getAllVideos = function (req, res) {
     });
 };
 
+// Create video chapters by splitting a video
+module.exports.createVideoChapters = function (req, res) {
+    console.log('creating chapters');
+
+    const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
+    
+    cmd.get(
+        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 1 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4',
+        function(err, data, stderr){
+            if(err){
+                console.log("error");
+                res.json({
+                    success: false,
+                    msg: err
+                });
+            }
+            else if(data){
+                console.log("data");
+                console.log(data);
+
+                res.json({
+                    success: true,
+                    msg: data
+                });
+            }
+            else if(stderr){
+                console.log("stderr");
+                console.log(stderr);
+                res.json({
+                    success: false,
+                    msg: stderr
+                });
+            }
+
+        }
+    );
+
+
+    /*var spawn = require("child_process").spawn;
+    var pythonProcess = spawn('python',["./python/videoChapters.py"]);
+
+    pythonProcess.stdout.on('data', function (data){
+        console.log(data.toString('utf8'));
+        res.json({
+            success: true,
+            msg: data
+        });
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+        console.log('error');
+        console.log(data);
+    })*/
+
+};
