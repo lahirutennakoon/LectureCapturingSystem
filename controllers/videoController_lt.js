@@ -6,7 +6,7 @@ const cmd=require('node-cmd');
 var fs = require('fs');
 
 //Import model
-const videoModel = require('../models/video_lt');
+const videoModel = new require('../models/video_lt');
 
 // Import configuration file
 const config = require('../configurations/config');
@@ -115,9 +115,9 @@ module.exports.createVideoChapters = function (req, res) {
     console.log('creating chapters');
 
     const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
-    
+
     cmd.get(
-        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 1 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4',
+        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 1 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv',
         function(err, data, stderr){
             if(err){
                 console.log("error");
@@ -130,10 +130,39 @@ module.exports.createVideoChapters = function (req, res) {
                 console.log("data");
                 console.log(data);
 
-                res.json({
-                    success: true,
-                    msg: data
-                });
+                const csvFilePath= config.videoSavingPath + 'scenes.csv';
+                const csv=require('csvtojson');
+                csv()
+                    .fromFile(csvFilePath)
+                    .then((jsonObj)=>{
+                        console.log('json');
+                        console.log(jsonObj);
+                        /**
+                         * [
+                         * 	{a:"1", b:"2", c:"3"},
+                         * 	{a:"4", b:"5". c:"6"}
+                         * ]
+                         */
+                    });
+
+                // Update status to processed in database
+                videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
+                    if(error)
+                    {
+                        res.json({
+                            success: false,
+                            msg: error
+                        });
+                    }
+                    else
+                    {
+                        res.json({
+                            success: true,
+                            msg: data
+                        });
+                    }
+                })
+
             }
             else if(stderr){
                 console.log("stderr");
@@ -146,22 +175,5 @@ module.exports.createVideoChapters = function (req, res) {
 
         }
     );
-
-
-    /*var spawn = require("child_process").spawn;
-    var pythonProcess = spawn('python',["./python/videoChapters.py"]);
-
-    pythonProcess.stdout.on('data', function (data){
-        console.log(data.toString('utf8'));
-        res.json({
-            success: true,
-            msg: data
-        });
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-        console.log('error');
-        console.log(data);
-    })*/
 
 };
