@@ -117,7 +117,7 @@ module.exports.createVideoChapters = function (req, res) {
     const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
 
     cmd.get(
-        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 1 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv',
+        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 1 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q',
         function(err, data, stderr){
             if(err){
                 console.log("error");
@@ -130,38 +130,54 @@ module.exports.createVideoChapters = function (req, res) {
                 console.log("data");
                 console.log(data);
 
+                // Array to hold video chapter names
+                const videoChapters = [];
+
                 const csvFilePath= config.videoSavingPath + 'scenes.csv';
                 const csv=require('csvtojson');
                 csv()
                     .fromFile(csvFilePath)
-                    .then((jsonObj)=>{
+                    .then((jsonObjArray)=>{
                         console.log('json');
-                        console.log(jsonObj);
-                        /**
-                         * [
-                         * 	{a:"1", b:"2", c:"3"},
-                         * 	{a:"4", b:"5". c:"6"}
-                         * ]
-                         */
-                    });
+                        // console.log(jsonObjArray);
+                        console.log('length:' + jsonObjArray.length);
 
-                // Update status to processed in database
-                videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
-                    if(error)
-                    {
-                        res.json({
-                            success: false,
-                            msg: error
+                        if(jsonObjArray.length<10 )
+                        {
+                            for(let i=1; i<jsonObjArray.length; i++)
+                            {
+                                let chapter = chapterName + '_chapter-00' + i + '.mp4';
+                                // console.log(chapter);
+                                // Add video chapter to array
+                                videoChapters.push(chapter);
+                            }
+
+                            console.log('array');
+                            console.log(videoChapters);
+                        }
+
+                        // Append video chapter array to request body
+                        req.body.videoChapters = videoChapters;
+
+                        // Update status to processed in database
+                        videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
+                            if(error)
+                            {
+                                res.json({
+                                    success: false,
+                                    msg: error
+                                });
+                            }
+                            else
+                            {
+                                res.json({
+                                    success: true,
+                                    msg: data
+                                });
+                            }
                         });
-                    }
-                    else
-                    {
-                        res.json({
-                            success: true,
-                            msg: data
-                        });
-                    }
-                })
+
+                    });
 
             }
             else if(stderr){
@@ -172,8 +188,23 @@ module.exports.createVideoChapters = function (req, res) {
                     msg: stderr
                 });
             }
-
         }
     );
+};
 
+// Get a single video
+module.exports.getOneVideo = function (req, res) {
+    videoModel.find({'lectureVideo': req.query.lectureVideo}, function (error, response) {
+        if(error)
+        {
+            res.json({
+                success: false,
+                msg: error
+            });
+        }
+        else
+        {
+            res.json(response);
+        }
+    })
 };

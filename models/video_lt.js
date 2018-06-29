@@ -21,7 +21,10 @@ const videoSchema = new Schema({
     status: {
         type: String,
         required: true
-    }
+    },
+    videoChapters: [{
+        type: String
+    }]
 });
 
 module.exports = mongoose.model('video_lt', videoSchema);
