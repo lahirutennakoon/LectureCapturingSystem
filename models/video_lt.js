@@ -6,14 +6,25 @@ const videoSchema = new Schema({
         type: String,
         required: true
     },
-    lecture: {
+    videoName: {
         type: String,
         required: true
+    },
+    lectureVideo: {
+        type: String,
+        required: true
+    },
+    dateTime: {
+        type: String,
+        required: false
     },
     status: {
         type: String,
         required: true
-    }
+    },
+    videoChapters: [{
+        type: String
+    }]
 });
 
 module.exports = mongoose.model('video_lt', videoSchema);
