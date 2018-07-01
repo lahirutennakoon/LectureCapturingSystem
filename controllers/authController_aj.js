@@ -96,22 +96,34 @@ module.exports = {
                     // args: ['value1', 'value2']
                 };
 
-                PythonShell.run('OpenCV-Face-Recognition-Python.py',options,function (err, results) {
-                    if (err){
-                        console.log("Server.PythonShell.error :" + err);
-                        // var pyshell = new PythonShell('OpenCV-Face-Recognition-Python.py');
-                        // pyshell.end(function (err,code,signal) {
-                        //     if (err) throw err;
-                        //     console.log('The exit code was: ' + code);
-                        //     console.log('The exit signal was: ' + signal);
-                        //     console.log('finished');
-                        //     console.log('finished');
-                        // });
-                        // callback(err, null);
-                    }else{
-                        console.log("Server.PythonShell.success :" + results);
-                    }
-                })
+                // PythonShell.run('OpenCV-Face-Recognition-Python.py',options,function (err, results) {
+                //     if (err){
+                //         console.log("Server.PythonShell.error :" + err);
+                //         // callback(err, null);
+                //     }else{
+                //         console.log("Server.PythonShell.success :" + results);
+                //     }
+                // });
+
+                const pyshell = new PythonShell('./controllers/opencv-face-recognition-python/OpenCV-Face-Recognition-Python.py');
+
+                pyshell.on('label_text', function (message) {
+                    // received a message sent from the Python script (a simple "print" statement)
+                    console.log("Server.PythonShell :" + message.toString());
+                });
+
+                pyshell.end(function (err,code,signal) {
+
+                    if (err) throw err;
+                    console.log('The exit code was: ' + code);
+                    console.log('The exit signal was: ' + signal);
+                    console.log('finished');
+                    console.log('finished');
+                });
+
+
+                console.log('Python script executed.');
+
             }
         });
 
