@@ -8,7 +8,6 @@ const cors = require('cors');
 const authCheckMiddleware = require('./middleware/authCheck_aj');
 var authRoute = require('./routes/auth_aj');
 
-
 // Import configuration file
 const config = require('./configurations/config');
 

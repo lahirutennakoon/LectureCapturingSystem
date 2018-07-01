@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User_aj');
+const User = require('../models/authentication/User_aj');
 const config = require('../configurations/config');
 
 module.exports = (req, res, next) => {
