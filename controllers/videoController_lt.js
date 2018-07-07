@@ -3,7 +3,9 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const cmd=require('node-cmd');
-var fs = require('fs');
+const fs = require('fs');
+var ffmpeg = require('fluent-ffmpeg');
+var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
 
 //Import model
 const videoModel = new require('../models/video_lt');
@@ -142,7 +144,7 @@ module.exports.createVideoChapters = function (req, res) {
                         // console.log(jsonObjArray);
                         console.log('length:' + jsonObjArray.length);
 
-                        if(jsonObjArray.length<10 )
+                        if(jsonObjArray.length<12 )
                         {
                             for(let i=1; i<jsonObjArray.length; i++)
                             {
@@ -208,3 +210,28 @@ module.exports.getOneVideo = function (req, res) {
         }
     })
 };
+
+//TEST
+module.exports.test = function (req, res) {
+
+    // Create an object of SpeechToText
+    var speech_to_text = new SpeechToTextV1({
+        "username": "c70e62af-7ac6-4b2b-8c03-2c29c90bca0a",
+        "password": "ZsN5o7UPmqQi"
+});
+    /*var proc = new ffmpeg({ source: 'D:/SLIIT/Year4,Semester1/CDAP/Prototype/OBSStudioPlugin/RecordedVideos/[Stardust] Rule the world_HD.mp4', nolog: true });
+
+
+    proc.setFfmpegPath("F:/Program Files/ffmpeg-20180706-cced03d-win64-static/bin/ffmpeg.exe")
+    .toFormat('mp3')
+
+        .on('end', function() {
+            console.log('file has been converted successfully');
+        })
+        .on('error', function(err) {
+            console.log('an error happened: ' + err.message);
+        })
+        // save to file <-- the new file I want -->
+        .saveToFile('D:/SLIIT/Year4,Semester1/CDAP/Prototype/OBSStudioPlugin/RecordedVideos/[Stardust] Rule the world_HD.mp3');*/
+    console.log('done');
+}
