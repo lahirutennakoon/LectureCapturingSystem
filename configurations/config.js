@@ -7,4 +7,9 @@ config.databaseUrl = 'mongodb://localhost:27017/LectureCapturingSystemDb';
 config.videoSavingPath = '../LectureSystemClient/public/videos/';
 config.JWTSECRET = 'rogueowlseverywhere';
 
+// Bluemix Watson speech to text
+config.bluemixSpeechToTextUrl = "https://stream.watsonplatform.net/speech-to-text/api";
+config.bluemixSpeechToTextUsername = 'c70e62af-7ac6-4b2b-8c03-2c29c90bca0a';
+config.bluemixSpeechToTextPassword = 'ZsN5o7UPmqQi';
+
 module.exports = config;
