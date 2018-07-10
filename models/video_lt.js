@@ -24,6 +24,9 @@ const videoSchema = new Schema({
     },
     videoChapters: [{
         type: String
+    }],
+    videoChaptersText: [{
+        type: String
     }]
 });
 

@@ -119,7 +119,7 @@ module.exports.createVideoChapters = function (req, res) {
     const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
 
     cmd.get(
-        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 1 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q',
+        'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 2 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q',
         function(err, data, stderr){
             if(err){
                 console.log("error");
@@ -152,6 +152,20 @@ module.exports.createVideoChapters = function (req, res) {
                                 // console.log(chapter);
                                 // Add video chapter to array
                                 videoChapters.push(chapter);
+
+                                // Convert video to audio using ffmpeg
+                                const proc = new ffmpeg({ source: config.videoSavingPath + chapter, nolog: true });
+                                proc.setFfmpegPath(config.ffmpegPath)
+                                    .toFormat('mp3')
+
+                                    .on('end', function() {
+                                        console.log('Video file converted to audio successfully');
+                                    })
+                                    .on('error', function(err) {
+                                        console.log('Error: ' + err.message);
+                                    })
+                                    // save to audio file
+                                    .saveToFile(config.videoSavingPath + chapterName + '_chapter-00' + i + '.mp3');
                             }
 
                             console.log('array');
@@ -215,12 +229,12 @@ module.exports.getOneVideo = function (req, res) {
 module.exports.test = function (req, res) {
 
     // Create an object of SpeechToText
-    const speech_to_text = new SpeechToTextV1({
+    /*const speech_to_text = new SpeechToTextV1({
         "username": "c70e62af-7ac6-4b2b-8c03-2c29c90bca0a",
         "password": "ZsN5o7UPmqQi"
     });
 
-    const files = ['/tmp/02.002 What is Angular.mp3'];
+    const files = ['D:/SLIIT/Year4,Semester1/CDAP/Prototype/LectureSystemClient/public/videos/audio.mp3'];
 
     for (let file in files)
     {
@@ -242,18 +256,18 @@ module.exports.test = function (req, res) {
                 for(let i=0; i<transcript.results.length; i++)
                 {
                     console.log(transcript.results[i].alternatives[0].transcript);
+                    console.log('NEW');
                 }
                 // console.log(JSON.stringify(transcript, null, 2));
                 // console.log(transcript.results[0].alternatives[0].transcript);
                 //     console.log(transcript.results[1].alternatives[0].transcript);
             }
         });
-    }
+    }*/
 
-    /*const proc = new ffmpeg({ source: '/tmp/02.002 What is Angular.mp4', nolog: true });
+    const proc = new ffmpeg({ source: '../LectureSystemClient/public/videos/1531154162004_lec2_cdap_chapter-001.mp4', nolog: true });
 
-
-    proc.setFfmpegPath("/usr/bin/ffmpeg")
+    proc.setFfmpegPath("F:/Program Files/ffmpeg-20180706-cced03d-win64-static/bin/ffmpeg.exe")
     .toFormat('mp3')
 
         .on('end', function() {
@@ -263,6 +277,6 @@ module.exports.test = function (req, res) {
             console.log('an error happened: ' + err.message);
         })
         // save to file <-- the new file I want -->
-        .saveToFile('/tmp/02.002 What is Angular.mp3');
-    console.log('done');*/
+        .saveToFile('../LectureSystemClient/public/videos/1531154162004_lec2_cdap_chapter-001.mp3');
+    console.log('done');
 };
