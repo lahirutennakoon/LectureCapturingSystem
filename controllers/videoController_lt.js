@@ -118,6 +118,12 @@ module.exports.createVideoChapters = function (req, res) {
 
     const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
 
+    // Create an object of SpeechToText
+    const speech_to_text = new SpeechToTextV1({
+        "username": "c70e62af-7ac6-4b2b-8c03-2c29c90bca0a",
+        "password": "ZsN5o7UPmqQi"
+    });
+
     cmd.get(
         'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 2 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q',
         function(err, data, stderr){
@@ -134,6 +140,9 @@ module.exports.createVideoChapters = function (req, res) {
 
                 // Array to hold video chapter names
                 const videoChapters = [];
+
+                // Array to hold video chapters' text
+                const videoChaptersText = [];
 
                 const csvFilePath= config.videoSavingPath + 'scenes.csv';
                 const csv=require('csvtojson');
@@ -160,6 +169,38 @@ module.exports.createVideoChapters = function (req, res) {
 
                                     .on('end', function() {
                                         console.log('Video file converted to audio successfully');
+
+                                        // Convert the audio to text
+                                        const params = {
+                                            audio: fs.createReadStream(config.videoSavingPath + chapterName + '_chapter-00' + i + '.mp3'),
+                                            content_type: 'audio/mp3'
+                                        };
+
+                                        speech_to_text.recognize(params, function (error, transcript) {
+                                            if (error)
+                                            {
+                                                console.log('Error:'+  error);
+                                            }
+                                            else
+                                            {
+                                                console.log('success');
+                                                console.log(transcript);
+
+                                                let text = '';
+
+                                                for(let i=0; i<transcript.results.length; i++)
+                                                {
+                                                    text = text + transcript.results[i].alternatives[0].transcript;
+                                                    console.log(transcript.results[i].alternatives[0].transcript);
+                                                    console.log('NEW');
+                                                }
+                                                // console.log(JSON.stringify(transcript, null, 2));
+                                                // console.log(transcript.results[0].alternatives[0].transcript);
+                                                //     console.log(transcript.results[1].alternatives[0].transcript);
+                                                videoChaptersText.push(text);
+
+                                            }
+                                        });
                                     })
                                     .on('error', function(err) {
                                         console.log('Error: ' + err.message);
@@ -170,10 +211,27 @@ module.exports.createVideoChapters = function (req, res) {
 
                             console.log('array');
                             console.log(videoChapters);
+                            console.log(videoChaptersText);
+
+                        }
+                        else
+                        {
+                            for(let i=1; i<10; i++)
+                            {
+                                console.log('1 to 10');
+                                console.log(i);
+                            }
+
+                            for(let i=10; i<jsonObjArray.length; i++)
+                            {
+                                console.log('10 to length');
+                                console.log(i);
+                            }
                         }
 
-                        // Append video chapter array to request body
+                        // Append video chapters and text array to request body
                         req.body.videoChapters = videoChapters;
+                        req.body.videoChaptersText = videoChaptersText;
 
                         // Update status to processed in database
                         videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
@@ -265,18 +323,5 @@ module.exports.test = function (req, res) {
         });
     }*/
 
-    const proc = new ffmpeg({ source: '../LectureSystemClient/public/videos/1531154162004_lec2_cdap_chapter-001.mp4', nolog: true });
 
-    proc.setFfmpegPath("F:/Program Files/ffmpeg-20180706-cced03d-win64-static/bin/ffmpeg.exe")
-    .toFormat('mp3')
-
-        .on('end', function() {
-            console.log('file has been converted successfully');
-        })
-        .on('error', function(err) {
-            console.log('an error happened: ' + err.message);
-        })
-        // save to file <-- the new file I want -->
-        .saveToFile('../LectureSystemClient/public/videos/1531154162004_lec2_cdap_chapter-001.mp3');
-    console.log('done');
 };
