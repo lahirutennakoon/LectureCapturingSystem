@@ -205,18 +205,12 @@ module.exports.createVideoChapters = function (req, res) {
                                                    {
                                                        console.log('Error pushing text to db.');
 
-                                                       /*res.json({
-                                                           success: false,
-                                                           msg: errorTxt
-                                                       });*/
+
                                                    }
                                                    else
                                                    {
                                                        console.log('Successfully pushed text to db.');
-                                                       /*res.json({
-                                                           success: true,
-                                                           msg: 'Successfully pushed text to db.'
-                                                       });*/
+
                                                    }
                                                 });
                                             }
@@ -258,10 +252,7 @@ module.exports.createVideoChapters = function (req, res) {
                             if(error)
                             {
                                 console.log(error);
-                                /*res.json({
-                                    success: false,
-                                    msg: error
-                                });*/
+
                             }
                             else
                             {
