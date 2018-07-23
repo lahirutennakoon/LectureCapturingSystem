@@ -184,7 +184,7 @@ module.exports.createVideoChapters = function (req, res) {
                                             else
                                             {
                                                 console.log('success');
-                                                console.log(transcript);
+                                                // console.log(transcript);
 
                                                 let text = '';
 
@@ -197,8 +197,28 @@ module.exports.createVideoChapters = function (req, res) {
                                                 // console.log(JSON.stringify(transcript, null, 2));
                                                 // console.log(transcript.results[0].alternatives[0].transcript);
                                                 //     console.log(transcript.results[1].alternatives[0].transcript);
-                                                videoChaptersText.push(text);
+                                                // videoChaptersText.push(text);
 
+                                                // Update videoChaptersText array
+                                                videoModel.update({'lectureVideo': req.body.lectureVideo}, {$push: {'videoChaptersText': text}}, (errorTxt, ResponseTxt) => {
+                                                   if(errorTxt)
+                                                   {
+                                                       console.log('Error pushing text to db.');
+
+                                                       /*res.json({
+                                                           success: false,
+                                                           msg: errorTxt
+                                                       });*/
+                                                   }
+                                                   else
+                                                   {
+                                                       console.log('Successfully pushed text to db.');
+                                                       /*res.json({
+                                                           success: true,
+                                                           msg: 'Successfully pushed text to db.'
+                                                       });*/
+                                                   }
+                                                });
                                             }
                                         });
                                     })
@@ -231,23 +251,26 @@ module.exports.createVideoChapters = function (req, res) {
 
                         // Append video chapters and text array to request body
                         req.body.videoChapters = videoChapters;
-                        req.body.videoChaptersText = videoChaptersText;
+                        // req.body.videoChaptersText = videoChaptersText;
 
                         // Update status to processed in database
                         videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
                             if(error)
                             {
-                                res.json({
+                                console.log(error);
+                                /*res.json({
                                     success: false,
                                     msg: error
-                                });
+                                });*/
                             }
                             else
                             {
-                                res.json({
+                                console.log('wrote video chapters to db');
+
+                                /*res.json({
                                     success: true,
                                     msg: data
-                                });
+                                });*/
                             }
                         });
 
