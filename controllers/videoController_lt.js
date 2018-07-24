@@ -7,8 +7,9 @@ const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
 
-//Import model
+//Import models
 const videoModel = new require('../models/video_lt');
+const videoChapterModel = new require('../models/videoChapter_lt');
 
 // Import configuration file
 const config = require('../configurations/config');
@@ -200,7 +201,7 @@ module.exports.createVideoChapters = function (req, res) {
                                                 // videoChaptersText.push(text);
 
                                                 // Update videoChaptersText array
-                                                videoModel.update({'lectureVideo': req.body.lectureVideo}, {$push: {'videoChaptersText': text}}, (errorTxt, ResponseTxt) => {
+                                                /*videoModel.update({'lectureVideo': req.body.lectureVideo}, {$push: {'videoChaptersText': text}}, (errorTxt, ResponseTxt) => {
                                                    if(errorTxt)
                                                    {
                                                        console.log('Error pushing text to db.');
@@ -212,7 +213,25 @@ module.exports.createVideoChapters = function (req, res) {
                                                        console.log('Successfully pushed text to db.');
 
                                                    }
+                                                });*/
+
+                                                //
+                                                let videoChapter = new videoChapterModel();
+                                                videoChapter.lectureVideo = req.body.lectureVideo;
+                                                videoChapter.videoChapter = chapter;
+                                                videoChapter.videoChapterText = text;
+
+                                                videoChapter.save((error) => {
+                                                    if(error)
+                                                    {
+                                                        console.log(error);
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log('Successfully pushed ' + chapter + ' to db.');
+                                                    }
                                                 });
+
                                             }
                                         });
                                     })
@@ -300,6 +319,7 @@ module.exports.getOneVideo = function (req, res) {
 //TEST
 module.exports.test = function (req, res) {
 
+    testFunction("abc");
     // Create an object of SpeechToText
     /*const speech_to_text = new SpeechToTextV1({
         "username": "c70e62af-7ac6-4b2b-8c03-2c29c90bca0a",
@@ -336,6 +356,13 @@ module.exports.test = function (req, res) {
             }
         });
     }*/
+};
 
+let testFunction = (arg1) => {
+    console.log('test');
+    console.log(arg1);
+};
+
+let convertCsvToJson = () => {
 
 };
