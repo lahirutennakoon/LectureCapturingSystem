@@ -2,7 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const cmd=require('node-cmd');
+const cmd = require('node-cmd');
+const csv = require('csvtojson');
 const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
@@ -113,8 +114,25 @@ module.exports.getAllVideos = function (req, res) {
     });
 };
 
-// Create video chapters by splitting a video
-module.exports.createVideoChapters = function (req, res) {
+// Get a single video
+module.exports.getOneVideo = function (req, res) {
+    videoModel.find({'lectureVideo': req.query.lectureVideo}, function (error, response) {
+        if(error)
+        {
+            res.json({
+                success: false,
+                msg: error
+            });
+        }
+        else
+        {
+            res.json(response);
+        }
+    })
+};
+
+//TEST
+module.exports.test = function (req, res) {
     console.log('creating chapters');
 
     const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
@@ -146,7 +164,6 @@ module.exports.createVideoChapters = function (req, res) {
                 const videoChaptersText = [];
 
                 const csvFilePath= config.videoSavingPath + 'scenes.csv';
-                const csv=require('csvtojson');
                 csv()
                     .fromFile(csvFilePath)
                     .then((jsonObjArray)=>{
@@ -277,10 +294,6 @@ module.exports.createVideoChapters = function (req, res) {
                             {
                                 console.log('wrote video chapters to db');
 
-                                /*res.json({
-                                    success: true,
-                                    msg: data
-                                });*/
                             }
                         });
 
@@ -299,70 +312,87 @@ module.exports.createVideoChapters = function (req, res) {
     );
 };
 
-// Get a single video
-module.exports.getOneVideo = function (req, res) {
-    videoModel.find({'lectureVideo': req.query.lectureVideo}, function (error, response) {
-        if(error)
-        {
-            res.json({
-                success: false,
-                msg: error
-            });
-        }
-        else
-        {
-            res.json(response);
-        }
-    })
-};
+// Create video chapters by splitting a video
+module.exports.createVideoChapters = async(req, res) => {
+    console.log('creating chapters');
 
-//TEST
-module.exports.test = function (req, res) {
+    // Remove dot and extension from video file
+    const chapterName = req.body.lectureVideo.toString().substr(0, req.body.lectureVideo.length-4);
 
-    testFunction("abc");
-    // Create an object of SpeechToText
-    /*const speech_to_text = new SpeechToTextV1({
-        "username": "c70e62af-7ac6-4b2b-8c03-2c29c90bca0a",
-        "password": "ZsN5o7UPmqQi"
-    });
+    const videoSplitCommand = 'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 2 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q';
+    const csvFilePath = config.videoSavingPath + 'scenes.csv';
 
-    const files = ['D:/SLIIT/Year4,Semester1/CDAP/Prototype/LectureSystemClient/public/videos/audio.mp3'];
+    console.log("chapterName: " + chapterName);
 
-    for (let file in files)
+    // Split the video file into chapters
+    try
     {
-        const params = {
-            audio: fs.createReadStream(files[file]),
-            content_type: 'audio/mp3'
-        };
+        console.log('splitting video');
+        /*const splitVideoToChaptersResult = await splitVideoToChapters(videoSplitCommand);
+        console.log(splitVideoToChaptersResult);*/
+    }
+    catch (e)
+    {
+        console.log('Error when splitting video:');
+        console.log(e);
+    }
 
-        speech_to_text.recognize(params, function (error, transcript) {
-            if (error)
-            {
-                console.log('Error:'+  error);
-            }
-            else
-            {
-                console.log('success');
-                console.log(transcript);
+    // Convert the csv file to json
+    try
+    {
+        console.log('converting csv to json');
 
-                for(let i=0; i<transcript.results.length; i++)
+        const jsonObjArray = await csv().fromFile(csvFilePath);
+
+        console.log(jsonObjArray);
+        console.log('length:' + jsonObjArray.length);
+    }
+    catch (e)
+    {
+        console.log(e);
+    }
+
+    for(let i=1; i<jsonObjArray.length; i++)
+    {
+        
+    }
+    console.log('done');
+
+
+};
+
+// Promise to split a video into chapters
+let splitVideoToChapters = (videoSplitCommand) => {
+    return new Promise((resolve, reject) => {
+        console.log('command: ' + videoSplitCommand);
+
+        cmd.get(videoSplitCommand, function(err, data, stderr) {
+                if (err)
                 {
-                    console.log(transcript.results[i].alternatives[0].transcript);
-                    console.log('NEW');
+                    reject(err);
                 }
-                // console.log(JSON.stringify(transcript, null, 2));
-                // console.log(transcript.results[0].alternatives[0].transcript);
-                //     console.log(transcript.results[1].alternatives[0].transcript);
-            }
-        });
-    }*/
+                else if (data)
+                {
+                    resolve(data);
+
+                }
+                else if (stderr)
+                {
+                    reject(err);
+
+                }
+            });
+    });
 };
 
-let testFunction = (arg1) => {
-    console.log('test');
-    console.log(arg1);
-};
+// Promise to convert csv file to json
+let convertCsvToJson = (csvFilePath) => {
+    return new Promise((resolve, reject) => {
+        csv()
+            .fromFile(csvFilePath)
+            .then((jsonObjArray) => {
+                resolve(jsonObjArray);
+            });
 
-let convertCsvToJson = () => {
-
+    });
 };

@@ -23,10 +23,8 @@ const videoSchema = new Schema({
         required: true
     },
     videoChapters: [{
-        type: String
-    }],
-    videoChaptersText: [{
-        type: String
+        videoChapterVideo: {type: String},
+        videoChapterText: {type: String}
     }]
 });
 
