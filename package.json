@@ -13,10 +13,13 @@
     "body-parser": "^1.18.3",
     "child_process": "^1.0.2",
     "cors": "^2.8.4",
+    "cors-prefetch-middleware": "^1.0.0",
     "express": "^4.16.3",
+    "images-upload-middleware": "^1.1.1",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.1.7",
-    "python-shell": "^0.5.0"
+    "python-shell": "^0.5.0",
+    "request": "^2.87.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.0"

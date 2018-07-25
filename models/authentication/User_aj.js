@@ -6,17 +6,25 @@ var SALT_WORK_FACTOR = 10;
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
-        index: { unique: true }
+        index: { unique: true },
+        required: true
     },
-    password: String,
+    password:{
+        type: String,
+        required: true
+    },
     created: {
         type: Date,
         required: true,
         default: new Date()
     },
     usertype: {
+        type: String,
+        required: true
+    },
+    images: [{
         type: String
-    }
+    }]
 
 });
 

@@ -17,7 +17,7 @@ const serverPort = config.serverPort;
 const databaseUrl = config.databaseUrl;
 
 server.use(routes);
-
+server.use(express.static('public/allImages'));
 server.use(cors());
 server.options('*', cors());
 
