@@ -3,7 +3,7 @@ var router = express.Router()
 var authController = require('../controllers/authController_aj')
 
 router.post('/faceLogin', function(req, res, next) {
-    authController.getFaceRecStatus(req.body.imageString, function(err, result){
+    authController.getFaceRecStatus(req.body.imageString, function(err, result,username,usertype){
         if(err){
             // console.log("");
             res.status(500).json({
@@ -15,7 +15,7 @@ router.post('/faceLogin', function(req, res, next) {
         if(result){
             res.status(200).json({
                 success: 1,
-                data: {result}
+                data: {tokenID: result, username: username, usertype: usertype}
             });
         }else{
             res.status(401).json({
@@ -57,7 +57,8 @@ router.post('/:username', function(req, res, next) {
 
 //register
 router.post('/', function(req, res, next) {
-    authController.register(req.body.username, req.body.password, req.body.usertype, function(err, result){
+    authController.register(req.body.username,
+        req.body.password, req.body.usertype, req.body.images, function(err, result){
         if(err){
             console.log(err);
             res.status(500).json({

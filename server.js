@@ -21,7 +21,7 @@ const databaseUrl = config.databaseUrl;
 server.use(cors());
 server.use(fileUpload());
 server.use(routes);
-
+server.use(express.static('public/allImages'));
 server.use(cors());
 server.options('*', cors());
 
