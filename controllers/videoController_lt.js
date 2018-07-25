@@ -10,7 +10,7 @@ const SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
 
 //Import models
 const videoModel = new require('../models/video_lt');
-const videoChapterModel = new require('../models/videoChapter_lt');
+// const videoChapterModel = new require('../models/videoChapter_lt');
 
 // Import configuration file
 const config = require('../configurations/config');
@@ -312,7 +312,7 @@ module.exports.test = function (req, res) {
     );
 };
 
-// Create video chapters by splitting a video
+// Async function to create video chapters by splitting a video
 module.exports.createVideoChapters = async(req, res) => {
     console.log('creating chapters');
 
@@ -321,6 +321,13 @@ module.exports.createVideoChapters = async(req, res) => {
 
     const videoSplitCommand = 'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 2 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q';
     const csvFilePath = config.videoSavingPath + 'scenes.csv';
+    let jsonObjArray;
+
+
+    // Array to hold video chapters
+    const videoChapters = [];
+
+
 
     console.log("chapterName: " + chapterName);
 
@@ -328,8 +335,8 @@ module.exports.createVideoChapters = async(req, res) => {
     try
     {
         console.log('splitting video');
-        /*const splitVideoToChaptersResult = await splitVideoToChapters(videoSplitCommand);
-        console.log(splitVideoToChaptersResult);*/
+        const splitVideoToChaptersResult = await splitVideoToChapters(videoSplitCommand);
+        console.log(splitVideoToChaptersResult);
     }
     catch (e)
     {
@@ -342,9 +349,9 @@ module.exports.createVideoChapters = async(req, res) => {
     {
         console.log('converting csv to json');
 
-        const jsonObjArray = await csv().fromFile(csvFilePath);
+        jsonObjArray = await csv().fromFile(csvFilePath);
 
-        console.log(jsonObjArray);
+        // console.log(jsonObjArray);
         console.log('length:' + jsonObjArray.length);
     }
     catch (e)
@@ -354,8 +361,38 @@ module.exports.createVideoChapters = async(req, res) => {
 
     for(let i=1; i<jsonObjArray.length; i++)
     {
-        
+        // Create name for each video chapter
+        let chapter = chapterName + '_chapter-00' + i + '.mp4';
+        let text = "text" + i;
+
+        // The video chapter to convert to audio
+        let videoToAudioConversion = await convertVideoToAudio(chapter, chapterName, i);
+
+        console.log(videoToAudioConversion);
+        // Add video chapter to array
+        videoChapters.push({"videoChapterVideo":chapter, "videoChapterText":text});
     }
+
+
+    console.log(videoChapters);
+
+    req.body.videoChapters = videoChapters;
+    console.log(req.body);
+
+    // Update status to processed in database
+    videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
+        if(error)
+        {
+            console.log(error);
+        }
+        else
+        {
+            console.log('Updated status to processed in database');
+        }
+    });
+
+    // videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, {$push: {'videoChapters':}})
+    //
     console.log('done');
 
 
@@ -374,25 +411,31 @@ let splitVideoToChapters = (videoSplitCommand) => {
                 else if (data)
                 {
                     resolve(data);
-
                 }
                 else if (stderr)
                 {
                     reject(err);
-
                 }
             });
     });
 };
 
 // Promise to convert csv file to json
-let convertCsvToJson = (csvFilePath) => {
+let convertVideoToAudio = (chapter, chapterName, number) => {
     return new Promise((resolve, reject) => {
-        csv()
-            .fromFile(csvFilePath)
-            .then((jsonObjArray) => {
-                resolve(jsonObjArray);
-            });
+        let videoToConvert = new ffmpeg({ source: config.videoSavingPath + chapter, nolog: true });
+
+        videoToConvert.setFfmpegPath(config.ffmpegPath)
+            .toFormat('mp3')
+
+            .on('end', function() {
+                resolve("Video converted to audio successfully");
+            })
+            .on('error', function(err) {
+                reject(err);
+            })
+            // save to audio file
+            .saveToFile(config.videoSavingPath + chapterName + '_chapter-00' + number + '.mp3');
 
     });
 };

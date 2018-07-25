@@ -12,6 +12,7 @@ const videoSchema = new Schema({
     },
     lectureVideo: {
         type: String,
+        unique: true,
         required: true
     },
     dateTime: {
