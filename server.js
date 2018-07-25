@@ -2,6 +2,8 @@
 const express        = require('express');
 const bodyParser     = require('body-parser');
 const mongoose = require('mongoose');
+
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const authCheckMiddleware = require('./middleware/authCheck_aj');
 var authRoute = require('./routes/auth_aj');
@@ -16,6 +18,8 @@ const server = express();
 const serverPort = config.serverPort;
 const databaseUrl = config.databaseUrl;
 
+server.use(cors());
+server.use(fileUpload());
 server.use(routes);
 server.use(express.static('public/allImages'));
 server.use(cors());
@@ -29,7 +33,7 @@ mongoose.connect(databaseUrl, function(err){
     else{
         console.log('Connected to: '+ databaseUrl)
     }
-})
+});
 
 server.use('/user', authRoute);
 
