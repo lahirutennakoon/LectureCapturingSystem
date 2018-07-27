@@ -44,7 +44,9 @@ mongoose.connect(databaseUrl, function (err) {
 server.use('/user', authRoute);
 
 io.on('connection', function (socket) {
+    setInterval(() => {
     io.emit('updated-stats', computeStats());
+    }, 3000);
     socket.on('visitor-data', function (data) {
         visitorsData[socket.id] = data;
         io.emit('updated-stats', computeStats());
