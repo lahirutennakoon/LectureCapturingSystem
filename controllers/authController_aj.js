@@ -168,37 +168,45 @@ module.exports = {
                         request(config.pythonRestUrl, function (error, response, body) {
                             if (error) {
                                 console.log('"getFaceRecStatus().request().error: ', error);
-                                callback("getFaceRecStatus().request().error: " + err, null, null, null);
+                                callback("getFaceRecStatus().request().error", null, null, null);
                             }
                             console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
                             console.log('body:', body); // Print the HTML for the Google homepage.
-                            let jsonData = JSON.parse(body);
-                            console.log('jsonData.name:', jsonData.name);
 
-                            if (jsonData.name === "error") {
-                                callback("Error: Image Corrupted or Null", null, null, null);
+                            if (body.startsWith("{")) {
+                                let jsonData = JSON.parse(body);
+
+                                console.log('jsonData.name:', jsonData.name);
+
+                                if (jsonData.name === "error") {
+                                    console.log("Error: Image Corrupted or Null");
+                                    callback("Error: Image Corrupted or Null", null, null, null);
+                                }
+
+                                User.findOne({ username: jsonData.name }, function (err, user) {
+                                    if (err) {
+                                        console.log("authController_aj().error :" + err);
+                                        callback(err, null, null, null);
+                                    }
+
+                                    if (!user) {
+                                        //User not found
+                                        console.log("authController_aj().error : User not found!");
+                                        callback("authController_aj().error : User not found!", null, null, null);
+
+                                    } else {
+
+                                        var authToken = jwt.sign({ username: user.username, _id: user._id }, config.JWTSECRET);
+                                        var usertype = user.usertype;
+                                        var username = user.username;
+                                        callback(null, authToken, username, usertype);
+                                    }
+
+                                });
+                            } else {
+                                console.log('Face not detected. Python script error! Try again!');
+                                callback("Face not detected", null, null, null);
                             }
-
-                            User.findOne({ username: jsonData.name }, function (err, user) {
-                                if (err) {
-                                    console.log("authController_aj().error :" + err);
-                                    callback(err, null, null, null);
-                                }
-
-                                if (!user) {
-                                    //User not found
-                                    console.log("authController_aj().error : User not found!");
-                                    callback("authController_aj().error : User not found!", null, null, null);
-
-                                } else {
-
-                                    var authToken = jwt.sign({ username: user.username, _id: user._id }, config.JWTSECRET);
-                                    var usertype = user.usertype;
-                                    var username = user.username;
-                                    callback(null, authToken, username, usertype);
-                                }
-
-                            });
 
                             console.log('Python script executed.');
 
