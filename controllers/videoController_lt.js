@@ -322,12 +322,12 @@ module.exports.createVideoChapters = async(req, res) => {
     const videoSplitCommand = 'scenedetect -i ' + config.videoSavingPath + req.body.lectureVideo + ' -d content -t 2 -o ' + config.videoSavingPath + chapterName + '_chapter.mp4 -co ' + config.videoSavingPath +'scenes.csv -q';
     const csvFilePath = config.videoSavingPath + 'scenes.csv';
     let jsonObjArray;
-
+    const audioFormat = 'audio/mp3';
+    let audio;
+    let text;
 
     // Array to hold video chapters
     const videoChapters = [];
-
-
 
     console.log("chapterName: " + chapterName);
 
@@ -356,6 +356,7 @@ module.exports.createVideoChapters = async(req, res) => {
     }
     catch (e)
     {
+        console.log('Error when converting csv file to json');
         console.log(e);
     }
 
@@ -363,18 +364,30 @@ module.exports.createVideoChapters = async(req, res) => {
     {
         // Create name for each video chapter
         let chapter = chapterName + '_chapter-00' + i + '.mp4';
-        let text = "text" + i;
 
-        // The video chapter to convert to audio
-        let videoToAudioConversion = await convertVideoToAudio(chapter, chapterName, i);
+        // Convert video chapter to audio
+        try {
+            audio = await convertVideoToAudio(chapter, chapterName, i);
+            console.log(audio);
+        }
+        catch (e) {
+            console.log('Error when converting video to audio');
+            console.log(e);
+        }
 
-        console.log(videoToAudioConversion);
+        // Convert audio to text
+        try {
+            text = await convertAudioToText(audio, audioFormat);
+        }
+        catch (e) {
+            console.log('Error when converting audio to text');
+            console.log(e);
+        }
+
         // Add video chapter to array
         videoChapters.push({"videoChapterVideo":chapter, "videoChapterText":text});
     }
 
-
-    console.log(videoChapters);
 
     req.body.videoChapters = videoChapters;
     console.log(req.body);
@@ -383,18 +396,24 @@ module.exports.createVideoChapters = async(req, res) => {
     videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, req.body, function (error, success) {
         if(error)
         {
+            console.log("Error during writing to database.");
             console.log(error);
+            res.json({
+                success: false,
+                msg: error
+            });
         }
         else
         {
-            console.log('Updated status to processed in database');
+            console.log('Wrote to database successfully');
+            res.json({
+                success: true,
+                msg: "Video chapters created successfully."
+            });
         }
     });
 
-    // videoModel.findOneAndUpdate({'lectureVideo': req.body.lectureVideo}, {$push: {'videoChapters':}})
-    //
     console.log('done');
-
 
 };
 
@@ -420,7 +439,7 @@ let splitVideoToChapters = (videoSplitCommand) => {
     });
 };
 
-// Promise to convert csv file to json
+// Promise to convert video chapter to audio
 let convertVideoToAudio = (chapter, chapterName, number) => {
     return new Promise((resolve, reject) => {
         let videoToConvert = new ffmpeg({ source: config.videoSavingPath + chapter, nolog: true });
@@ -429,7 +448,7 @@ let convertVideoToAudio = (chapter, chapterName, number) => {
             .toFormat('mp3')
 
             .on('end', function() {
-                resolve("Video converted to audio successfully");
+                resolve(config.videoSavingPath + chapterName + '_chapter-00' + number + '.mp3');
             })
             .on('error', function(err) {
                 reject(err);
@@ -437,5 +456,39 @@ let convertVideoToAudio = (chapter, chapterName, number) => {
             // save to audio file
             .saveToFile(config.videoSavingPath + chapterName + '_chapter-00' + number + '.mp3');
 
+    });
+};
+
+// Promise to convert audio to text
+let convertAudioToText = (audio, audioFormat) => {
+    return new Promise((resolve, reject) => {
+        // Create an object of SpeechToText
+        const speech_to_text = new SpeechToTextV1({
+            "username": config.bluemixSpeechToTextUsername,
+            "password": config.bluemixSpeechToTextPassword
+        });
+
+        // Parameters of the audio file
+        const params = {
+            audio: fs.createReadStream(audio),
+            content_type: audioFormat
+        };
+
+        speech_to_text.recognize(params, function (error, transcript) {
+            if (error) {
+                reject(error);
+            }
+            else {
+                let text = '';
+
+                for (let i = 0; i < transcript.results.length; i++) {
+                    text = text + transcript.results[i].alternatives[0].transcript;
+                    // console.log(transcript.results[i].alternatives[0].transcript);
+                    // console.log('NEW');
+                }
+
+                resolve(text);
+            }
+        });
     });
 };
