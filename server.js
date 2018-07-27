@@ -3,6 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
 const server = express();
 
 //SOCKET.IO
@@ -41,11 +43,22 @@ mongoose.connect(databaseUrl, function (err) {
     }
 });
 
+var db = mongoose.connection;
+
+server.use(session({
+    secret: 'work hard',
+    resave: true,
+    saveUninitialized: false,
+    store: new MongoStore({
+        mongooseConnection: db
+    })
+}));
+
 server.use('/user', authRoute);
 
 io.on('connection', function (socket) {
     setInterval(() => {
-    io.emit('updated-stats', computeStats());
+        io.emit('updated-stats', computeStats());
     }, 3000);
     socket.on('visitor-data', function (data) {
         visitorsData[socket.id] = data;
