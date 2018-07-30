@@ -1,6 +1,8 @@
 var express = require('express')
 var router = express.Router()
 var authController = require('../controllers/authController_aj')
+const config = require('../configurations/config');
+var request = require('request');
 
 router.post('/faceLogin', function(req, res, next) {
     authController.getFaceRecStatus(req.body.imageString, function(err, result,username,usertype){
@@ -72,6 +74,16 @@ router.post('/', function(req, res, next) {
                 success: 1,
                 data: {tokenID: result, username: req.body.username}
             });
+
+            //train data for face recognition after a registration
+            request(config.pythonTrainImagesUrl, function (error, response, body) {
+                if (error) {
+                    console.log('"faceTrain().Ragister().request().error: ', error);
+                }
+                console.log("response :"+response && response.statusCode);
+                console.log("body :" + body);
+            });
+
         }else{
             res.status(401).json({
                 success: 0,
