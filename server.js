@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 const server = express();
 var request = require('request');
-
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
 //SOCKET.IO
 var http = require('http').Server(server);
 var io = require('socket.io')(http);
@@ -41,6 +42,16 @@ mongoose.connect(databaseUrl, function (err) {
         console.log('Connected to: ' + databaseUrl)
     }
 });
+
+var db = mongoose.connection;
+ server.use(session({
+    secret: 'sdjlasfhkjdhfa',
+    resave: true,
+    saveUninitialized: false,
+    store: new MongoStore({
+        mongooseConnection: db
+    })
+}));
 
 server.use('/user', authRoute);
 

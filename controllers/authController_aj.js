@@ -31,7 +31,7 @@ module.exports = {
                     if (isMatch) {
                         var authToken = jwt.sign({ username: user.username, _id: user._id }, config.JWTSECRET);
                         var usertype = user.usertype;
-                        callback(null, authToken, usertype);
+                        callback(null, authToken, usertype,user._id);
                     } else {
                         callback(err, null);
                     }
