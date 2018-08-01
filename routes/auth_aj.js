@@ -4,6 +4,27 @@ var authController = require('../controllers/authController_aj')
 const config = require('../configurations/config');
 var request = require('request');
 
+// GET for logout logout
+router.get('/logout', function (req, res, next) {
+    if (req.session) {
+        // delete session object
+        req.session.destroy(function (err) {
+            if (err) {
+                res.status(500).json({
+                    success: 0,
+                    error: err
+                })
+                return;
+            } else {
+                console.log("Session Destroyed!");
+                res.status(200).json({
+                    success: 1
+                });
+            }
+        });
+    }
+});
+
 router.post('/faceLogin', function(req, res, next) {
     authController.getFaceRecStatus(req.body.imageString, function(err, result,username,usertype){
         if(err){
@@ -29,8 +50,8 @@ router.post('/faceLogin', function(req, res, next) {
 
 });
 
-router.post('/:username', function(req, res, next) {
-    authController.login(req.body.username, req.body.password, function(err, result,usertype){
+router.post('/:username', function (req, res, next) {
+    authController.login(req.body.username, req.body.password, function (err, result, usertype, userId) {
         if(err){
             console.log(err);
             res.status(500).json({
@@ -41,11 +62,12 @@ router.post('/:username', function(req, res, next) {
         }
 
         if(result){
-
+            req.session.userId = userId;
+            req.session.username = req.body.username;
             // console.log("authController().login().result :" + usertype);
             res.status(200).json({
                 success: 1,
-                data: {tokenID: result, username: req.body.username, usertype: usertype}
+                data: {tokenID: result, username: req.body.username, usertype: usertype, userid: userId}
             });
         }else{
             res.status(401).json({
