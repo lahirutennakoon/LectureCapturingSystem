@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 const server = express();
+var request = require('request');
 
 //SOCKET.IO
 var http = require('http').Server(server);
@@ -103,5 +104,15 @@ http.listen(serverPort, err => {
         return;
     }
     console.log('Server listening on port: ' + serverPort);
+    console.log('Training Image data for face login..');
+    request(config.pythonTrainImagesUrl, function (error, response, body) {
+        if (error) {
+            console.log('"faceTrain().request().error: ', error);
+        }
+        // console.log("response :"+response && response.statusCode);
+        console.log(body);
+    });
+
+    
 });
 
