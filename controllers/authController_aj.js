@@ -199,7 +199,7 @@ module.exports = {
                                         var authToken = jwt.sign({ username: user.username, _id: user._id }, config.JWTSECRET);
                                         var usertype = user.usertype;
                                         var username = user.username;
-                                        callback(null, authToken, username, usertype);
+                                        callback(null, authToken, username, usertype, user._id);
                                     }
 
                                 });

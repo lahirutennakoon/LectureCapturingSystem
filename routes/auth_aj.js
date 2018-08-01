@@ -26,7 +26,7 @@ router.get('/logout', function (req, res, next) {
 });
 
 router.post('/faceLogin', function(req, res, next) {
-    authController.getFaceRecStatus(req.body.imageString, function(err, result,username,usertype){
+    authController.getFaceRecStatus(req.body.imageString, function(err, result,username,usertype,userID){
         if(err){
             // console.log("");
             res.status(500).json({
@@ -36,9 +36,13 @@ router.post('/faceLogin', function(req, res, next) {
             return;
         }
         if(result){
+            //SESSION
+            req.session.userId = userID;
+            req.session.username = username;
+
             res.status(200).json({
                 success: 1,
-                data: {tokenID: result, username: username, usertype: usertype}
+                data: {tokenID: result, username: username, usertype: usertype, userid: userID}
             });
         }else{
             res.status(401).json({
@@ -62,6 +66,7 @@ router.post('/:username', function (req, res, next) {
         }
 
         if(result){
+            //SESSION
             req.session.userId = userId;
             req.session.username = req.body.username;
             // console.log("authController().login().result :" + usertype);
