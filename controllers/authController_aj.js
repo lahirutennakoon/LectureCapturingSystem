@@ -31,7 +31,7 @@ module.exports = {
                     if (isMatch) {
                         var authToken = jwt.sign({ username: user.username, _id: user._id }, config.JWTSECRET);
                         var usertype = user.usertype;
-                        callback(null, authToken, usertype,user._id);
+                        callback(null, authToken, usertype, user._id);
                     } else {
                         callback(err, null);
                     }
@@ -220,5 +220,44 @@ module.exports = {
 
 
     },
+
+    updateUser: function (username, password, usertype, images, userID, callback) {
+        // console.log("updateUser userID:"+userID);
+        // console.log("updateUser userID:"+username);
+        // console.log("updateUser userID:"+password);
+        // console.log("updateUser userID:"+usertype);
+        // console.log("updateUser userID:"+images);
+        User.findByIdAndUpdate(userID,
+            {
+                username: username,
+                password: password,
+                usertype: usertype,
+                images: images
+            },
+            function (err, response) {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    console.log(response);
+                    console.log('user updated!');
+                    callback(null, "Updated");
+                }
+            });
+    },
+
+    deleteUser: function (userID, callback) {
+        console.log("deleteUser userID:"+userID);
+        User.findByIdAndRemove(userID,
+
+            function (err) {
+                if (err) {
+                    callback(err, null);
+                } 
+                    // console.log('user deleted!');
+                    callback(null, "Deleted");
+                
+            });
+    }
+
 
 };

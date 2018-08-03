@@ -4,6 +4,61 @@ var authController = require('../controllers/authController_aj')
 const config = require('../configurations/config');
 var request = require('request');
 
+
+
+router.post('/delete', function(req, res, next) {
+    authController.deleteUser(req.body.userid,function(err, result){
+        if(err){
+            // console.log("");
+            res.status(500).json({
+                success: 0,
+                error: err
+            })
+            return;
+        }
+        if(result){
+
+            res.status(200).json({
+                success: 1,
+                // data: {tokenID: result, username: username, usertype: usertype, userid: userID}
+            });
+        }else{
+            res.status(401).json({
+                success: 0,
+                data: result
+            });
+        }
+    });
+
+});
+
+router.post('/updateUser', function(req, res, next) {
+    authController.updateUser(req.body.username,
+        req.body.password, req.body.usertype, req.body.images, req.body._id,function(err, result){
+        if(err){
+            // console.log("");
+            res.status(500).json({
+                success: 0,
+                error: err
+            })
+            return;
+        }
+        if(result){
+
+            res.status(200).json({
+                success: 1,
+                // data: {tokenID: result, username: username, usertype: usertype, userid: userID}
+            });
+        }else{
+            res.status(401).json({
+                success: 0,
+                data: result
+            });
+        }
+    });
+
+});
+
 // GET for logout logout
 router.get('/logout', function (req, res, next) {
     if (req.session) {
