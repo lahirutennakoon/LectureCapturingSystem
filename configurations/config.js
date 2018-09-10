@@ -12,6 +12,8 @@ config.pythonRestUrl = 'http://127.0.0.1:5003/postdata';
 config.testPath = './opencv-face-recognition-python/test-data/test.jpg';
 config.imagesTrainingPath = './opencv-face-recognition-python/training-data/s';
 config.pythonTrainImagesUrl = 'http://127.0.0.1:5003/train';
+config.attendanceImagePath = './public/attendanceImages/test.jpg';
+
 
 // Bluemix Watson speech to text
 config.bluemixSpeechToTextUrl = "https://stream.watsonplatform.net/speech-to-text/api";

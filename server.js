@@ -14,6 +14,7 @@ var io = require('socket.io')(http);
 const cors = require('cors');
 const authCheckMiddleware = require('./middleware/authCheck_aj');
 var authRoute = require('./routes/auth_aj');
+var attendanceRoute = require('./routes/attendance_aj');
 
 // Import configuration file
 const config = require('./configurations/config');
@@ -54,6 +55,7 @@ var db = mongoose.connection;
 }));
 
 server.use('/user', authRoute);
+server.use('/student', attendanceRoute);
 
 io.on('connection', function (socket) {
     setInterval(() => {
