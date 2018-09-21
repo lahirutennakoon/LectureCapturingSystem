@@ -2,12 +2,14 @@
 # @author ashen
 #
 
-from flask import Flask, request
+from flask import Flask, request, render_template, Response
 import json
 import cv2
 import os
 import numpy as np
 import sys
+# emulated camera
+from camera import Camera
 
 app = Flask(__name__)
 
@@ -16,6 +18,8 @@ faces = []
 labels = []
 #create our LBPH face recognizer 
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+# face_recognizer = cv2.face.EigenFaceRecognizer_create()
+# face_recognizer = cv2.face.FisherFaceRecognizer_create()
 
 @app.route('/')
 def index():
@@ -107,11 +111,11 @@ def detect_face(img):
     
     #load OpenCV face detector, I am using LBP which is fast
     #there is also a more accurate but slow Haar classifier
-    face_cascade = cv2.CascadeClassifier('./opencv-files/lbpcascade_frontalface.xml')
-
+    #face_cascade = cv2.CascadeClassifier('./opencv-files/lbpcascade_frontalface.xml')
+    face_cascade = cv2.CascadeClassifier('./opencv-files/haarcascade_frontalface_default.xml')
     #let's detect multiscale (some images may be closer to camera than others) images
     #result is a list of faces
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
     
     #if no faces are detected then return original img
     if (len(faces) == 0):
@@ -125,7 +129,20 @@ def detect_face(img):
     #return only the face part of the image
     return gray[y:y+w, x:x+h], faces[0]
 
-
+def gen(camera):
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
+ 
+ 
+@app.route('/video_feed')
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+ 
 
 if __name__ == "__main__":
 	app.run(port=5003)

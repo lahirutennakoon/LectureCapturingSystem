@@ -13,7 +13,8 @@ config.testPath = './opencv-face-recognition-python/test-data/test.jpg';
 config.imagesTrainingPath = './opencv-face-recognition-python/training-data/s';
 config.pythonTrainImagesUrl = 'http://127.0.0.1:5003/train';
 config.attendanceImagePath = './public/attendanceImages/test.jpg';
-
+config.bandPath = './public/video/sample.mp4';
+config.attendancePythonUrl = 'http://localhost:5004/cam_Release';
 
 // Bluemix Watson speech to text
 config.bluemixSpeechToTextUrl = "https://stream.watsonplatform.net/speech-to-text/api";

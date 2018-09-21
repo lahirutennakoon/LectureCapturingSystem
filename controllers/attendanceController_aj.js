@@ -4,13 +4,36 @@ const config = require('../configurations/config');
 var User = require('../models/authentication/User_aj')
 var backupUsers = require('../models/authentication/password_aj')
 var User = require('../models/authentication/User_aj')
+var Attendance = require('../models/attendance')
 const fs = require('fs');
 const PythonShell = require('python-shell');
 var request = require('request');
 
 module.exports = {
 
+    
+    deleteAttendance: function (attendanceID, callback) {
+        
+        Attendance.findByIdAndRemove(attendanceID,
 
+            function (err) {
+                if (err) {
+                    callback(err, null);
+                } 
+                    console.log("attendanceID:"+attendanceID+ " Deleted!");
+                    callback(null, "Attendance Row Deleted");
+                
+            });
+    },
+    getAllAttendance: function (callback) {
+        Attendance.find({}, function (err, data) {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            callback(null, data);
+        });
+    },
     markAttendance: function (imageBase64String, callback) {
 
         // console.log("markAttendance().imageString : " + imageBase64String);
@@ -23,7 +46,7 @@ module.exports = {
             fs.writeFile(config.attendanceImagePath, base64data, "base64", function (err) {
                 if (err) {
                     console.log("markAttendance()" + err); // writes out file without error, but it's not a valid image
-                    callback(err, null, null , null);
+                    callback(err, null, null, null);
                 } else {
 
                     request(config.pythonRestUrl, function (error, response, body) {
@@ -47,6 +70,8 @@ module.exports = {
                                 var usertype = user.usertype;
                                 var username = user.username;
                                 callback(null, username, usertype, user._id);
+
+
                             }
 
                         });
@@ -67,7 +92,7 @@ module.exports = {
                 fs.writeFile(config.attendanceImagePath, base64data, "base64", function (err) {
                     if (err) {
                         console.log("markAttendance()" + err); // writes out file without error, but it's not a valid image
-                        callback(err, null,null,null);
+                        callback(err, null, null, null);
                     } else {
 
                         request(config.pythonRestUrl, function (error, response, body) {
@@ -103,7 +128,18 @@ module.exports = {
 
                                         var usertype = user.usertype;
                                         var username = user.username;
-                                        callback(null, username, usertype, user._id);
+
+                                        var status = 'Present';
+                                        var attendance = new Attendance({ username, usertype, status });
+
+                                        attendance.save(function (err, attendance) {
+                                            if (err) {
+                                                callback(err, null);
+                                                return;
+                                            }
+                                        });
+
+                                        callback(null, "success");
                                     }
 
                                 });
