@@ -8,8 +8,7 @@ import cv2
 import os
 import numpy as np
 import sys
-# emulated camera
-from camera import Camera
+
 
 app = Flask(__name__)
 
@@ -129,20 +128,6 @@ def detect_face(img):
     #return only the face part of the image
     return gray[y:y+w, x:x+h], faces[0]
 
-def gen(camera):
-    """Video streaming generator function."""
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
- 
- 
-@app.route('/video_feed')
-def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
- 
 
 if __name__ == "__main__":
 	app.run(port=5003)
