@@ -100,8 +100,14 @@ def predict(test_img):
 
     label_text = subjects[label]
     print("Predicted Name :", label_text)
-    print("confidence :", confidence)
-    return label_text
+    # print("confidence :", confidence)
+    confidencePercentage = "  {0}%".format(round(100 - confidence))
+    print("Confidence Percentage % :", confidencePercentage)
+
+    if confidence < 90:
+        return label_text
+    else:
+        return None
 
 
 def detect_face(img):
