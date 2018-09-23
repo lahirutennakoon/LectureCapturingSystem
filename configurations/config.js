@@ -8,6 +8,7 @@ config.ffmpegPath = 'F:/Program Files/ffmpeg-20180706-cced03d-win64-static/bin/f
 //Face Recognition Configs
 config.JWTSECRET = 'rogueowlseverywhere';
 config.imageCopyPath = './public/allImages/';
+config.pythonLoginUrl = 'http://127.0.0.1:5004/loginAfterFeed';
 config.pythonRestUrl = 'http://127.0.0.1:5003/postdata';
 config.testPath = './opencv-face-recognition-python/test-data/test.jpg';
 config.imagesTrainingPath = './opencv-face-recognition-python/training-data/s';

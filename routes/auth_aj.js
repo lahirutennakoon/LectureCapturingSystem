@@ -5,6 +5,34 @@ const config = require('../configurations/config');
 var request = require('request');
 
 
+router.get('/loginNew', function(req, res, next) {
+    authController.loginNewFunc(function(err, result,username,usertype,userID){
+        if(err){
+            // console.log("");
+            res.status(500).json({
+                success: 0,
+                error: err
+            })
+            return;
+        }
+        if(result){
+            //SESSION
+            req.session.userId = userID;
+            req.session.username = username;
+
+            res.status(200).json({
+                success: 1,
+                data: {tokenID: result, username: username, usertype: usertype, userid: userID}
+            });
+        }else{
+            res.status(401).json({
+                success: 0,
+                data: result
+            });
+        }
+    });
+
+});
 
 router.post('/delete', function(req, res, next) {
     authController.deleteUser(req.body.userid,function(err, result){

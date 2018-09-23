@@ -100,7 +100,7 @@ def predict(test_img):
 
     label_text = subjects[label]
     print("Predicted Name :", label_text)
-    # print("confidence :", confidence)
+    print("confidence :", confidence)
     confidencePercentage = "  {0}%".format(round(100 - confidence))
     print("Confidence Percentage % :", confidencePercentage)
 
@@ -120,7 +120,7 @@ def detect_face(img):
     face_cascade = cv2.CascadeClassifier('./opencv-files/haarcascade_frontalface_default.xml')
     #let's detect multiscale (some images may be closer to camera than others) images
     #result is a list of faces
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
     
     #if no faces are detected then return original img
     if (len(faces) == 0):

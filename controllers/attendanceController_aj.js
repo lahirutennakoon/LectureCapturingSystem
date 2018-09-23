@@ -11,18 +11,18 @@ var request = require('request');
 
 module.exports = {
 
-    
+
     deleteAttendance: function (attendanceID, callback) {
-        
+
         Attendance.findByIdAndRemove(attendanceID,
 
             function (err) {
                 if (err) {
                     callback(err, null);
-                } 
-                    console.log("attendanceID:"+attendanceID+ " Deleted!");
-                    callback(null, "Attendance Row Deleted");
-                
+                }
+                console.log("attendanceID:" + attendanceID + " Deleted!");
+                callback(null, "Attendance Row Deleted");
+
             });
     },
     getAllAttendance: function (callback) {
@@ -33,6 +33,65 @@ module.exports = {
             }
             callback(null, data);
         });
+    },
+    markAttendance2: function (callback) {
+        request(config.pythonLoginUrl, function (error, response, body) {
+            if (error) {
+                console.log('"markAttendance2().request().error: ', error);
+                callback("markAttendance2().request().error", null, null, null);
+            }
+            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+            console.log('body:', body); // Print the HTML for the Google homepage.
+
+            if (body.startsWith("{")) {
+                let jsonData = JSON.parse(body);
+
+                console.log('jsonData.name:', jsonData.name);
+
+                if (jsonData.name === "error") {
+                    console.log("Error: Image Corrupted or Null");
+                    callback("Error: Image Corrupted or Null", null, null, null);
+                }
+
+                User.findOne({ username: jsonData.name }, function (err, user) {
+                    if (err) {
+                        console.log("attendanceController_aj().error :" + err);
+                        callback(err, null, null, null);
+                    }
+
+                    if (!user) {
+                        //User not found
+                        console.log("attendanceController_aj().error : User not found!");
+                        callback("attendanceController_aj().error : User not found!", null, null, null);
+
+                    } else {
+
+                        var usertype = user.usertype;
+                        var username = user.username;
+
+                        var status = 'Present';
+                        var attendance = new Attendance({ username, usertype, status });
+
+                        attendance.save(function (err, attendance) {
+                            if (err) {
+                                callback(err, null);
+                                return;
+                            }
+                        });
+
+                        callback(null, "success");
+                    }
+
+                });
+            } else {
+                console.log('Face not detected. Python script error! Try again!');
+                callback("Face not detected", null, null, null);
+            }
+
+            console.log('Python script executed.');
+
+        })
+
     },
     markAttendance: function (imageBase64String, callback) {
 
@@ -49,7 +108,7 @@ module.exports = {
                     callback(err, null, null, null);
                 } else {
 
-                    request(config.pythonRestUrl, function (error, response, body) {
+                    request(config.pythonLoginUrl, function (error, response, body) {
                         console.log('error:', error); // Print the error if one occurred
                         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
                         console.log('body:', body); // Print the HTML for the Google homepage.
@@ -95,7 +154,7 @@ module.exports = {
                         callback(err, null, null, null);
                     } else {
 
-                        request(config.pythonRestUrl, function (error, response, body) {
+                        request(config.pythonLoginUrl, function (error, response, body) {
                             if (error) {
                                 console.log('"markAttendance().request().error: ', error);
                                 callback("markAttendance().request().error", null, null, null);

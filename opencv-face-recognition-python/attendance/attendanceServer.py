@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, Response
- 
+import json 
 # emulated camera
 from camera import Camera
  
@@ -39,6 +39,22 @@ def releaseFunc(camera):
 def release():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return releaseFunc(Camera())
+
+@app.route('/loginAfterFeed')
+def loginAfterFeed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    label = loginFunc(Camera())
+    print("loginAfterFeed label:", label)
+    if label is None:
+        return json.dumps({"name":"error"})
+    else:
+        return json.dumps({"name":label})
+
+def loginFunc(camera):
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    label = camera.login()
+    print("loginFunc label:", label)
+    return label
  
  
 if __name__ == '__main__':
