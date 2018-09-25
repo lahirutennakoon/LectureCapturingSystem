@@ -58,7 +58,7 @@ class Camera():
 			id = 0
 
 			# names related to ids: example ==> Marcelo: id=1,  etc
-			names = ['None', 'ashen', 'Paula', 'Ilza', 'Z', 'W'] 
+			names = ['None', 'ashen', 'lahiru', 'vimukthi', 'Z', 'W'] 
 			self.frames = open("stream.jpg", 'wb+')
 			
 			while True:
