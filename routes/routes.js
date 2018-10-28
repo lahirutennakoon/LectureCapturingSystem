@@ -20,5 +20,10 @@ router.get('/api/video', videoController_lt.getOneVideo);
 
 // ptzController routes
 router.get('/api/recalibrateCamera', ptzController_vm.recalibrateCamera);
+router.get('/api/turnLeftCamera', ptzController_vm.turnLeftCamera);
+router.get('/api/turnRightCamera', ptzController_vm.turnRightCamera);
+router.get('/api/turnUpCamera', ptzController_vm.turnUpCamera);
+router.get('/api/turnDownCamera', ptzController_vm.turnDownCamera);
+router.get('/api/stopMovementCamera', ptzController_vm.stopMovementCamera);
 
 module.exports = router;
