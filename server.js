@@ -119,15 +119,5 @@ http.listen(serverPort, err => {
         return;
     }
     console.log('Server listening on port: ' + serverPort);
-    console.log('Training Image data for face login..');
-    request(config.pythonTrainImagesUrl, function (error, response, body) {
-        if (error) {
-            console.log('"faceTrain().request().error: ', error);
-        }
-        // console.log("response :"+response && response.statusCode);
-        console.log(body);
-    });
-
-    
 });
 
