@@ -57,7 +57,7 @@ class Camera():
 			#iniciate id counter
 			id = 0
 
-			# names related to ids: example ==> Marcelo: id=1,  etc
+			# names related to ids: example ==> ashen: id=1,  etc
 			names = ['None', 'ashen', 'lahiru', 'vimukthi', 'Z', 'W'] 
 			self.frames = open("stream.jpg", 'wb+')
 			
@@ -81,17 +81,21 @@ class Camera():
 
 					id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
 
+					threshold = round(100 - confidence)
+					print("Threshold :", threshold)
 					# Check if confidence is less them 100 ==> "0" is perfect match 
-					if (confidence < 100):
+					if (threshold > 20):
 						id = names[id]
 						global globalId
+						print("Camera.get_frame() Inside threshold")
 						globalId = str(id)
 						confidence = "  {0}%".format(round(100 - confidence))
+						print("Camera.get_frame() threshold > 20 ")
 					else:
 						id = "unknown"
 						globalId = str(id)
 						confidence = "  {0}%".format(round(100 - confidence))
-					# print("Camera.get_frame() global : ",globalId )
+					print("Camera.get_frame() global : ",globalId )
 					cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
 					cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1) 
 				if s:	# frame captures without errors...ss

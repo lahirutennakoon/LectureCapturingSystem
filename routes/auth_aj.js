@@ -8,7 +8,7 @@ var request = require('request');
 router.get('/loginNew', function(req, res, next) {
     authController.loginNewFunc(function(err, result,username,usertype,userID){
         if(err){
-            // console.log("");
+            console.log("Error /loginNew authController.loginNewFunc");
             res.status(500).json({
                 success: 0,
                 error: err
