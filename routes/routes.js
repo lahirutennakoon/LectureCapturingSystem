@@ -28,9 +28,12 @@ router.get('/api/turnDownCamera', ptzController_vm.turnDownCamera);
 router.get('/api/stopMovementCamera', ptzController_vm.stopMovementCamera);
 router.get('/api/zoomInCamera', ptzController_vm.zoomInCamera);
 router.get('/api/zoomOutCamera', ptzController_vm.zoomOutCamera);
+router.get('/api/turn_to_audience', ptzController_vm.turn_to_audience);
 
 //lecture advanced controls
 router.get('/api/runTrackerScript', trackerController_vm.runTrackerScript);
-
+router.get('/api/startLectureTracker', trackerController_vm.startLectureTracker);
+router.get('/api/stopTracker', trackerController_vm.stopTracker);
+router.get('/api/startGestureDetection', trackerController_vm.startGestureDetection);
 
 module.exports = router;

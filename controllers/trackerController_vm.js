@@ -3,34 +3,37 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 
-var child_process = require('child_process');
+const child_process = require('child_process');
 
 // Import configuration file
 const config = require('../configurations/config');
 
 router.use(bodyParser.json());
 
+
+module.exports.startLectureTracker = (req, res) => {
+
+    console.log('startLectureTracker');
+};
+
+module.exports.startGestureDetection = (req, res) => {
+
+    console.log('startGestureDetection');
+};
+
+module.exports.stopTracker = (req, res) => {
+
+    console.log('stopTracker');
+};
+
 module.exports.runTrackerScript = (req, res) => {
 
-    //console.log('yay');
+    console.log('yay');
     //res.json('hello');
 
-
-    // child_process.exec('Research_CDAP_R\\Lecture_Tracker_and_Move_Camera\\onvif_movement\\lcs_controller.bat', function(error, stdout, stderr) {
-    //     console.log(stdout);
-    // });
-
-    const { exec } = require('child_process');
-    exec('custom_vm.bat', (err, stdout, stderr) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
+    child_process.exec('notepad', function(error, stdout, stderr) {
         console.log(stdout);
     });
-
-
-
 
     res.json({
         success:true,
@@ -38,8 +41,7 @@ module.exports.runTrackerScript = (req, res) => {
     });
 
 
-
-    // videoModel.find({}, function (error, videos) {
+    // courseModel.find({}, function (error, res) {
     //     if(error){
     //         res.json({
     //             success: false,
@@ -48,7 +50,7 @@ module.exports.runTrackerScript = (req, res) => {
     //     }
     //     else
     //     {
-    //         res.json(videos);
+    //         res.json(res);
     //     }
     // });
 

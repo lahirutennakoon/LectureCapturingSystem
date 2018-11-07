@@ -731,6 +731,146 @@ module.exports.zoomOutCamera = (req, res) => {
     });
 };
 
+
+module.exports.turn_to_audience = (req, res) => {
+
+    new Cam({
+        hostname : HOSTNAME,
+        username : USERNAME,
+        password : PASSWORD,
+        port : PORT,
+        timeout : 10000
+    }, function CamFunc(err) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        var cam_obj = this;
+        var stop_timer;
+        var ignore_keypress = false;
+        var preset_names = [];
+        var preset_tokens = [];
+
+        cam_obj.getStreamUri({
+                protocol : 'RTSP'
+            },	// Completion callback function
+            // This callback is executed once we have a StreamUri
+            function (err, stream, xml) {
+                if (err) {
+                    console.log(err);
+                    return;
+                } else {
+
+                }
+            }
+        );
+
+        cam_obj.getPresets({}, // use 'default' profileToken
+
+            function (err, stream, xml) {
+                if (err) {
+                    console.log("GetPreset Error "+err);
+                    return;
+                } else {
+                    // loop over the presets and populate the arrays
+                    // Do this for the first 9 presets
+                    console.log("GetPreset Reply");
+                    var count = 1;
+                    for(var item in stream) {
+                        var name = item;          //key
+                        var token = stream[item]; //value
+                        // It is possible to have a preset with a blank name so generate a name
+                        if (name.length == 0) name='no name ('+token+')';
+                        preset_names.push(name);
+                        preset_tokens.push(token);
+
+                        // Show first 9 preset names to user
+                        /*if (count < 9) {
+                            console.log('Press key '+count+ ' for preset "' + name + '"');
+                        count++;
+                        }*/
+                    }
+                    goto_preset(5);
+                }
+            }
+        );
+
+        function move(x_speed, y_speed, zoom_speed, msg) {
+
+            // Pause keyboard processing
+            ignore_keypress = true;
+
+            // Clear any pending 'stop' commands
+            if (stop_timer) clearTimeout(stop_timer);
+
+            // Move the camera
+            console.log('sending move command ' + msg);
+            cam_obj.continuousMove({x : x_speed,
+                    y : y_speed,
+                    zoom : zoom_speed } ,
+                // completion callback function
+                function (err, stream, xml) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('move command sent '+ msg);
+                        // schedule a Stop command to run in the future
+                        stop_timer = setTimeout(stop,STOP_DELAY_MS);
+                    }
+                    // Resume keyboard processing
+                    ignore_keypress = false;
+                });
+        }
+
+
+        function stop() {
+            // send a stop command, stopping Pan/Tilt and stopping zoom
+            console.log('sending stop command');
+            cam_obj.stop({panTilt: true, zoom: true},
+                function (err,stream, xml){
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('stop command sent');
+                    }
+                });
+        }
+
+
+        function goto_preset(number) {
+            if (number > preset_names.length) {
+                console.log ("No preset " + number);
+                return;
+            }
+
+            console.log('sending goto preset command '+preset_names[number-1]);
+            cam_obj.gotoPreset({ preset : preset_tokens[number-1] } ,
+                // completion callback function
+                function (err, stream, xml) {
+                    if (err) {
+                        console.log(err);
+
+                        res.json({
+                            success: false,
+                            msg: err
+                        });
+                    } else {
+                        //console.log('goto preset command sent ');
+                        //exit process once done!
+                        // process.exit();
+
+                        //console.log('done');
+                        res.json({
+                            success:true,
+                            msg:'Camera Recalibrate Success'
+                        });
+                    }
+                });
+        }
+    });
+};
+
 /*
 		if      (key && key.name == 'up')    move(0,1,0,'up');
 			else if (key && key.name == 'down')  move(0,-1,0,'down');
