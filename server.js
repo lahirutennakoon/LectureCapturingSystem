@@ -17,6 +17,7 @@ var authRoute = require('./routes/auth_aj');
 var attendanceRoute = require('./routes/attendance_aj');
 var bandRoute = require('./routes/bandwidth_aj');
 
+var courseRoute = require('./routes/course_vm');
 // Import configuration file
 const config = require('./configurations/config');
 
@@ -58,6 +59,8 @@ var db = mongoose.connection;
 server.use('/user', authRoute);
 server.use('/student', attendanceRoute);
 server.use('/bandwidth', bandRoute);
+
+server.use('/course', courseRoute);
 
 io.on('connection', function (socket) {
     setInterval(() => {
@@ -120,4 +123,3 @@ http.listen(serverPort, err => {
     }
     console.log('Server listening on port: ' + serverPort);
 });
-
