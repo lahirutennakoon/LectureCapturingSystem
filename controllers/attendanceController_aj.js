@@ -13,7 +13,7 @@ module.exports = {
 
 
     deleteAttendance: function (attendanceID, callback) {
-
+        console.log("attendanceController_aj().deleteAttendance().attendanceID:" + attendanceID);
         Attendance.findByIdAndRemove(attendanceID,
 
             function (err) {
