@@ -28,6 +28,7 @@ router.get('/api/turnDownCamera', ptzController_vm.turnDownCamera);
 router.get('/api/stopMovementCamera', ptzController_vm.stopMovementCamera);
 router.get('/api/zoomInCamera', ptzController_vm.zoomInCamera);
 router.get('/api/zoomOutCamera', ptzController_vm.zoomOutCamera);
+router.get('/api/go_to_podium', ptzController_vm.go_to_podium);
 router.get('/api/turn_to_audience', ptzController_vm.turn_to_audience);
 
 //lecture advanced controls
