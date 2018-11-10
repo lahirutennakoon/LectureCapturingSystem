@@ -564,6 +564,11 @@ module.exports.stopMovementCamera = (req, res) => {
                     //console.log('in here');
                     //THE FUNCTION NEEDED!
                     stop();
+
+                    res.json({
+                        success:true,
+                        msg:'Camera right'
+                    });
                 }
             }
         );

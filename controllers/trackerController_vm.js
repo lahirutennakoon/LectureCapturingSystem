@@ -33,23 +33,39 @@ module.exports.startLectureTracker = (req, res) => {
 
     child_process.execSync('start cmd.exe /K cd D:\\Research_CDAP_R\\Lecture_Tracker_and_Move_Camera');
 
+    res.json({
+        success:true,
+        msg:'Camera right'
+    });
+
 
 };
 
 module.exports.startGestureDetection = (req, res) => {
 
     console.log('startGestureDetection');
+
+    res.json({
+        success:true,
+        msg:'Camera right'
+    });
 };
 
 module.exports.stopTracker = (req, res) => {
 
     console.log('stopTracker');
 
+    res.json({
+        success:true,
+        msg:'Camera right'
+    });
+
 };
 
 module.exports.runTrackerScript = (req, res) => {
 
     console.log('runTrackerScript Called');
+
     //res.json('hello');
 
     /*child_process.exec('notepad', function(error, stdout, stderr) {
@@ -62,5 +78,10 @@ module.exports.runTrackerScript = (req, res) => {
     });*/
 
     child_process.execSync('start cmd.exe /K cd D:\\Research_CDAP_R\\Lecture_Tracker_and_Move_Camera\\onvif_movement');
+
+    res.json({
+        success:true,
+        msg:'Camera right'
+    });
 };
 
