@@ -179,7 +179,7 @@ module.exports.turnLeftCamera = (req, res) => {
         username : USERNAME,
         password : PASSWORD,
         port : PORT,
-        timeout : 10000
+        timeout : 100
     }, function CamFunc(err) {
         if (err) {
             console.log(err);
@@ -204,6 +204,10 @@ module.exports.turnLeftCamera = (req, res) => {
                 else {
                     //THE FUNCTION NEEDED!
                     move(-1,0,0,'left');
+                    res.json({
+                        success:true,
+                        msg:'Camera left'
+                    });
                 }
             }
         );
@@ -290,6 +294,10 @@ module.exports.turnRightCamera = (req, res) => {
                 else {
                     //THE FUNCTION NEEDED!
                     move(1,0,0,'right');
+                    res.json({
+                        success:true,
+                        msg:'Camera right'
+                    });
                 }
             }
         );
@@ -375,6 +383,10 @@ module.exports.turnUpCamera = (req, res) => {
                 else {
                     //THE FUNCTION NEEDED!
                     move(0,-1,0,'down');
+                    res.json({
+                        success:true,
+                        msg:'Camera down'
+                    });
                 }
             }
         );
@@ -460,6 +472,10 @@ module.exports.turnDownCamera = (req, res) => {
                 else {
                     //THE FUNCTION NEEDED!
                     move(0,1,0,'up');
+                    res.json({
+                        success:true,
+                        msg:'Camera up'
+                    });
                 }
             }
         );
@@ -601,6 +617,10 @@ module.exports.zoomInCamera = (req, res) => {
                 else {
                     //THE FUNCTION NEEDED!
                     move(0,0,1,'zoom in');
+                    res.json({
+                        success:true,
+                        msg:'Camera zoom in'
+                    });
                 }
             }
         );
@@ -683,6 +703,10 @@ module.exports.zoomOutCamera = (req, res) => {
                 else {
                     //THE FUNCTION NEEDED!
                     move(0,0,-1,'zoom out')
+                    res.json({
+                        success:true,
+                        msg:'Camera zoom out'
+                    });
                 }
             }
         );
