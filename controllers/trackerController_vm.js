@@ -5,13 +5,12 @@ const bodyParser = require('body-parser');
 
 const child_process = require('child_process');
 //for python run
-const spawn = require("child_process").spawn;
-
+//const spawn = require("child_process").spawn;
+//const cmd = require('node-cmd');
 // Import configuration file
 const config = require('../configurations/config');
 
 router.use(bodyParser.json());
-
 
 module.exports.startLectureTracker = (req, res) => {
 
@@ -31,13 +30,21 @@ module.exports.startLectureTracker = (req, res) => {
     //var child_process = require('child_process');
     //child_process.execSync('start cmd.exe /K node ');
 
+    // cmd.get(
+    //     'python D:\\Research_CDAP_R\\Lecture_Tracker_and_Move_Camera\\lec_tracker_move_cam.py',
+    //     function(err, data, stderr){
+    //         console.log('the current working dir is : ',data);
+    //         console.log('the current working dir is : ',err);
+    //         console.log('the current working dir is : ',stderr);
+    //     }
+    // );
+
     child_process.execSync('start cmd.exe /K cd D:\\Research_CDAP_R\\Lecture_Tracker_and_Move_Camera');
 
     res.json({
         success:true,
-        msg:'Camera right'
+        msg:'Lec Tracker Started'
     });
-
 
 };
 
