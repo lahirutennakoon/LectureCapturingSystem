@@ -72,7 +72,8 @@ module.exports.saveIPStream = (req, res) => {
 
 
 //    child_process.execSync('start cmd.exe /K ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\lec_recording.ts');
-    child_process.execSync('start cmd.exe /K ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\'+fileName+'.ts');
+   // child_process.execSync('start cmd.exe /K ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\'+fileName+'.ts');
+    child_process.execSync('start cmd.exe /K ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\'+fileName+'.mp4');
 
     res.json({
         success:true,
