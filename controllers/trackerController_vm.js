@@ -4,9 +4,10 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 
 const child_process = require('child_process');
+const child_process2 = require('child_process');
 //for python run
 //const spawn = require("child_process").spawn;
-//const cmd = require('node-cmd');
+const cmd = require('node-cmd');
 // Import configuration file
 const config = require('../configurations/config');
 
@@ -48,13 +49,45 @@ module.exports.startLectureTracker = (req, res) => {
 
 };
 
-module.exports.startGestureDetection = (req, res) => {
 
-    console.log('startGestureDetection');
+module.exports.saveIPStream = (req, res) => {
+
+    console.log('saveIPStream started!');
+
+    // cmd.get(
+    //     'ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\lec_recording.ts',
+    //     function(err, data, stderr){
+    //         console.log('the current working dir is : ',data);
+    //         console.log('error : ',err);
+    //         console.log('stderr : ',stderr);
+    //     }
+    // );
+    //var fileName = new Date(Date.now()).toLocaleString();
+    //var fileName = new Date(Date.now()).toLocaleString().replace('-', '.').replace('-', '.').replace(':', '.').replace(':', '.');
+
+    var d = new Date();
+    var df = d.getMonth()+'-'+d.getDate()+'-'+(d.getHours())+'_'+d.getMinutes();
+    var fileName = 'lcs_ip_record_'+df;
+    console.log(fileName);
+
+
+//    child_process.execSync('start cmd.exe /K ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\lec_recording.ts');
+    child_process.execSync('start cmd.exe /K ffmpeg -re -acodec pcm_s16le -ac 1 -rtsp_transport tcp -i rtsp://192.168.1.110:554/1/h264major -vcodec copy -acodec libfdk_aac -vbr 5 C:\\Lecture_Videos\\'+fileName+'.ts');
 
     res.json({
         success:true,
-        msg:'Camera right'
+        msg:'saveIPStream'
+    });
+};
+
+
+module.exports.startGestureDetection = (req, res) => {
+
+    console.log('startGestureDetection');
+    child_process.execSync('start cmd.exe /K cd D:\\Research_CDAP_R\\Lecture_Tracker_and_Move_Camera');
+    res.json({
+        success:true,
+        msg:'Camera'
     });
 };
 
@@ -62,9 +95,19 @@ module.exports.stopTracker = (req, res) => {
 
     console.log('stopTracker');
 
+    //child_process2.execSync('start cmd.exe /K taskkill /F /IM cmd.exe');
+    cmd.get(
+        'taskkill /F /IM cmd.exe',
+        function(err, data, stderr){
+            //console.log('the current working dir is : ',data);
+            //console.log('error : ',err);
+            //console.log('stderr : ',stderr);
+        }
+    );
+
     res.json({
         success:true,
-        msg:'Camera right'
+        msg:'stop tracker'
     });
 
 };

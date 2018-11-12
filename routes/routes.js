@@ -36,5 +36,7 @@ router.get('/api/runTrackerScript', trackerController_vm.runTrackerScript);
 router.get('/api/startLectureTracker', trackerController_vm.startLectureTracker);
 router.get('/api/stopTracker', trackerController_vm.stopTracker);
 router.get('/api/startGestureDetection', trackerController_vm.startGestureDetection);
+router.get('/api/saveIPStream', trackerController_vm.saveIPStream);
+
 
 module.exports = router;
