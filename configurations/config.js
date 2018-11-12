@@ -3,7 +3,7 @@ const config = {};
 config.serverPort = 5000;
 config.databaseUrl = 'mongodb://127.0.0.1:27017/LectureCapturingSystemDb';
 config.videoSavingPath = '../LectureSystemClient/public/videos/';
-config.ffmpegPath = 'F:/Program Files/ffmpeg-20180706-cced03d-win64-static/bin/ffmpeg.exe';
+config.ffmpegPath = 'C:/Required/ffmpeg_old/bin/ffmpeg.exe';
 
 //Face Recognition Configs
 config.JWTSECRET = 'rogueowlseverywhere';
